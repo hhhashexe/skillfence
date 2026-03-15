@@ -1,0 +1,24 @@
+name: 'SkillFence Security Scan'
+description: 'Scan AI agent skills and MCP configs for security vulnerabilities. 35 rules mapped to OWASP MCP Top 10.'
+inputs:
+  path:
+    description: 'Path to scan'
+    default: '.'
+  format:
+    description: 'Output format (pretty, json, sarif, quiet)'
+    default: 'pretty'
+  fail-on:
+    description: 'Fail on verdict (block, warn, review, never)'
+    default: 'block'
+branding:
+  icon: shield
+  color: purple
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Run SkillFence scan
+      run: npx github:hhhashexe/skillfence scan ${{ inputs.path }} --${{ inputs.format }}
+      shell: bash

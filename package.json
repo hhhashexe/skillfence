@@ -1,0 +1,46 @@
+{
+  "name": "skillfence",
+  "version": "1.2.0",
+  "description": "Security scanner for AI agent skills, MCP servers, and tool configs. Detects prompt injection, credential leaks, tool poisoning, and data exfiltration.",
+  "main": "lib/scanner.js",
+  "bin": {
+    "skillfence": "bin/skillfence.js"
+  },
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "security",
+    "mcp",
+    "ai-agent",
+    "prompt-injection",
+    "tool-poisoning",
+    "supply-chain",
+    "scanner",
+    "audit",
+    "claude",
+    "openai",
+    "llm",
+    "vulnerability",
+    "owasp"
+  ],
+  "author": "hhhashexe",
+  "license": "MIT",
+  "homepage": "https://hhhashexe.github.io/skillfence/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hhhashexe/skillfence.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hhhashexe/skillfence/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ]
+}

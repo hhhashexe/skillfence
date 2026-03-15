@@ -1,0 +1,25 @@
+name: SkillFence Security Scan
+on: [push, pull_request]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Run SkillFence scan
+        run: |
+          npx github:hhhashexe/skillfence scan . --sarif > skillfence-results.sarif || true
+          npx github:hhhashexe/skillfence scan .
+      
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: skillfence-results.sarif
+        if: always()
