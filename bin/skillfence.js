@@ -34,6 +34,7 @@ const SEV_COLORS = {
   HIGH:     `${c.red}${c.bold} HIGH ${c.reset}`,
   MEDIUM:   `${c.yellow} MEDIUM ${c.reset}`,
   LOW:      `${c.dim} LOW ${c.reset}`,
+  INFO:     `${c.blue} INFO ${c.reset}`,
 };
 
 const VERDICT_DISPLAY = {
@@ -50,10 +51,12 @@ const args = process.argv.slice(2);
 const command = args[0];
 
 function printBanner() {
+  const pkg = require('../package.json');
+  const ruleCount = PATTERNS.length;
   console.log(`
 ${c.magenta}${c.bold}  ╔═══════════════════════════════════╗
   ║  🛡️  SkillFence Security Scanner  ║
-  ║     v1.1.0 • 76 detection rules   ║
+  ║     v${pkg.version} • ${ruleCount} detection rules  ║
   ╚═══════════════════════════════════╝${c.reset}
 `);
 }
@@ -69,8 +72,9 @@ function printHelp() {
 
 ${c.bold}OPTIONS${c.reset}
   ${c.dim}--json${c.reset}         Output as JSON
-  ${c.dim}--sarif${c.reset}        Output as SARIF (for IDE integration)
+  ${c.dim}--sarif${c.reset}        Output as SARIF (GitHub Security tab)
   ${c.dim}--quiet${c.reset}        Only output verdict and exit code
+  ${c.dim}--no-context${c.reset}   Disable context-aware filtering
   ${c.dim}--no-color${c.reset}     Disable colors
 
 ${c.bold}EXIT CODES${c.reset}
@@ -134,8 +138,12 @@ function printFindings(result, filePath) {
     for (const [file, fileResult] of Object.entries(result.files)) {
       console.log(`${c.bold}${c.cyan}📄 ${file}${c.reset}`);
       for (const f of fileResult.findings) {
-        console.log(`  ${SEV_COLORS[f.severity]} ${f.description}`);
+        const confTag = f.confidence === 'low' ? ` ${c.dim}[low confidence]${c.reset}` : '';
+        console.log(`  ${SEV_COLORS[f.severity] || SEV_COLORS.LOW} ${f.description}${confTag}`);
         console.log(`  ${c.dim}   Rule: ${f.id} | OWASP: ${f.owasp} | Match: "${f.sample}"${c.reset}`);
+        if (f.contextNote) {
+          console.log(`  ${c.blue}   ℹ Context: ${f.contextNote}${f.originalSeverity ? ` (was ${f.originalSeverity})` : ''}${c.reset}`);
+        }
         console.log(`  ${c.green}   Fix: ${f.fix}${c.reset}`);
       }
       console.log();
@@ -170,7 +178,8 @@ function printFindings(result, filePath) {
   console.log(`${c.bold}───────────────────────────────────${c.reset}`);
   console.log(`  ${VERDICT_DISPLAY[result.verdict]}`);
   console.log(`  ${c.bold}Risk Score:${c.reset} ${result.score}/100`);
-  console.log(`  ${c.red}${c.bold}${summary.critical}${c.reset} critical  ${c.yellow}${summary.high}${c.reset} high  ${c.dim}${summary.medium}${c.reset} medium  ${c.dim}${summary.low || 0}${c.reset} low`);
+  const infoCount = summary.info || 0;
+  console.log(`  ${c.red}${c.bold}${summary.critical}${c.reset} critical  ${c.yellow}${summary.high}${c.reset} high  ${c.dim}${summary.medium}${c.reset} medium  ${c.dim}${summary.low || 0}${c.reset} low${infoCount ? `  ${c.blue}${infoCount}${c.reset} info` : ''}`);
   console.log(`${c.bold}───────────────────────────────────${c.reset}\n`);
 }
 
@@ -200,6 +209,8 @@ if (command === 'scan') {
   const isSarif = args.includes('--sarif');
   const isQuiet = args.includes('--quiet');
   const isStdin = args.includes('--stdin');
+  const noContext = args.includes('--no-context');
+  const scanOptions = { contextAware: !noContext };
 
   let result;
 
@@ -209,7 +220,7 @@ if (command === 'scan') {
     process.stdin.setEncoding('utf8');
     process.stdin.on('data', chunk => input += chunk);
     process.stdin.on('end', () => {
-      result = scanContent(input, 'stdin');
+      result = scanContent(input, 'stdin', scanOptions);
       outputResult(result, 'stdin');
     });
     return;
@@ -223,10 +234,10 @@ if (command === 'scan') {
 
   const stat = fs.statSync(targetPath);
   if (stat.isDirectory()) {
-    result = scanDirectory(targetPath);
+    result = scanDirectory(targetPath, scanOptions);
   } else {
     const content = fs.readFileSync(targetPath, 'utf8');
-    result = scanContent(content, target);
+    result = scanContent(content, target, scanOptions);
   }
 
   outputResult(result, target);

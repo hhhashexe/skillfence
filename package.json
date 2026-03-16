@@ -1,7 +1,7 @@
 {
   "name": "skillfence",
-  "version": "1.2.0",
-  "description": "Security scanner for AI agent skills, MCP servers, and tool configs. Detects prompt injection, credential leaks, tool poisoning, and data exfiltration.",
+  "version": "2.0.0",
+  "description": "Context-aware security scanner for AI agent skills, MCP servers, and tool configs. 95+ rules with false-positive reduction. Detects prompt injection, credential leaks, CORS misconfig, SSRF, tool poisoning, and data exfiltration.",
   "main": "lib/scanner.js",
   "bin": {
     "skillfence": "bin/skillfence.js"
