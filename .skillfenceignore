@@ -1,0 +1,5 @@
+# SkillFence self-scan exclusions
+# These files contain security patterns as examples/documentation
+lib/patterns.js
+lib/context.js
+test/

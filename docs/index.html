@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillFence — AI Agent Security Scanner</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .hero { text-align: center; padding: 4rem 2rem 2rem; max-width: 700px; }
+    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    h1 span { color: #58a6ff; }
+    .tagline { font-size: 1.2rem; color: #8b949e; margin-bottom: 2rem; }
+    .stats { display: flex; gap: 2rem; justify-content: center; margin: 2rem 0; flex-wrap: wrap; }
+    .stat { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem 1.5rem; text-align: center; }
+    .stat .num { font-size: 2rem; font-weight: bold; color: #58a6ff; }
+    .stat .label { font-size: 0.85rem; color: #8b949e; }
+    .install { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; font-family: monospace; font-size: 1.1rem; color: #7ee787; }
+    .badges { display: flex; gap: 0.5rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap; }
+    .badges img { height: 20px; }
+    .features { max-width: 700px; padding: 2rem; }
+    .features h2 { color: #58a6ff; margin-bottom: 1rem; }
+    .features ul { list-style: none; }
+    .features li { padding: 0.5rem 0; border-bottom: 1px solid #21262d; }
+    .features li::before { content: "🛡️ "; }
+    a { color: #58a6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .cta { margin: 2rem 0; }
+    .cta a { background: #238636; color: #fff; padding: 0.75rem 2rem; border-radius: 6px; font-weight: bold; }
+    .cta a:hover { background: #2ea043; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>🛡️ <span>SkillFence</span></h1>
+    <p class="tagline">Security scanner for AI agent skills, MCP servers, and tool configs</p>
+    
+    <div class="badges">
+      <img src="https://img.shields.io/npm/v/skillfence?color=blue" alt="npm version">
+      <img src="https://img.shields.io/npm/dm/skillfence?color=green" alt="downloads">
+      <img src="https://img.shields.io/badge/rules-102-brightgreen" alt="102 rules">
+      <img src="https://img.shields.io/badge/OWASP-MCP%20Top%2010-red" alt="OWASP MCP Top 10">
+    </div>
+
+    <div class="install">npx skillfence scan .</div>
+
+    <div class="stats">
+      <div class="stat"><div class="num">102</div><div class="label">Detection Rules</div></div>
+      <div class="stat"><div class="num">0</div><div class="label">Dependencies</div></div>
+      <div class="stat"><div class="num">10+</div><div class="label">Repos Audited</div></div>
+    </div>
+
+    <div class="cta">
+      <a href="https://github.com/hhhashexe/skillfence">View on GitHub →</a>
+    </div>
+  </div>
+
+  <div class="features">
+    <h2>What it detects</h2>
+    <ul>
+      <li>Remote Code Execution (curl pipe, eval, exec)</li>
+      <li>Prompt Injection & Tool Poisoning (MCP-specific)</li>
+      <li>Credential Leaks & Hardcoded Secrets</li>
+      <li>CORS Misconfigurations & SSRF</li>
+      <li>JWT Weaknesses & Auth Bypass</li>
+      <li>AI Agent Tool Exposure (usableAsTool without HITL)</li>
+      <li>Trust Score Manipulation</li>
+      <li>Data Exfiltration Patterns</li>
+      <li>Supply Chain Attacks (typosquatting, malicious deps)</li>
+      <li>Context-aware: docs vs code vs tests</li>
+    </ul>
+  </div>
+
+  <p style="padding: 2rem; color: #484f58; font-size: 0.8rem;">
+    Built by <a href="https://github.com/hhhashexe">@hhhashexe</a> · 
+    <a href="https://npmjs.com/package/skillfence">npm</a> · 
+    <a href="https://github.com/hhhashexe/skillfence">GitHub</a>
+  </p>
+</body>
+</html>
