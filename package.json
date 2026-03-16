@@ -1,6 +1,6 @@
 {
   "name": "skillfence",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Context-aware security scanner for AI agent skills, MCP servers, and tool configs. 95+ rules with false-positive reduction. Detects prompt injection, credential leaks, CORS misconfig, SSRF, tool poisoning, and data exfiltration.",
   "main": "lib/scanner.js",
   "bin": {
