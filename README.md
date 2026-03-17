@@ -1,9 +1,22 @@
 # 🛡️ SkillFence
 
+> **"Genuinely one of the best security audits I received — 4 rounds, 9 GitHub issues, honest FP corrections, and actionable fixes. Professional-grade work."**
+> — kai, founder of AgentPass
+
 Security scanner for AI agent skills, MCP servers, and tool configs.
 
 [![npm](https://img.shields.io/npm/v/skillfence)](https://npmjs.com/package/skillfence)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+## Why SkillFence?
+
+**43% of MCP servers contain security vulnerabilities.** Most ship with prompt injection vectors, data exfiltration paths, or hardcoded credentials — and nobody scans them before installation.
+
+SkillFence catches these before they reach production:
+
+- ✅ **coinpayportal.com** — 18 critical/high security issues found and patched *(CORS wildcard on payment API, zero rate limiting, admin exposure)*
+- ✅ **AgentPass** — 9 issues across 4 audit rounds *(CRITICAL: default JWT secret in public repo, trust score manipulation)*
+- ✅ **isnad.site** — 11 issues *(unauthenticated evidence submission, replay attacks)*
 
 ## Quick Start
 
@@ -33,6 +46,14 @@ npx skillfence rules               # List all 76 rules
 | 📦 Supply Chain | 6 | typosquatting, lifecycle scripts, unsafe-perm |
 | 💰 Crypto / Financial | 4 | wallet theft, transaction signing, token approvals |
 | 🔒 Privilege Escalation | 1 | sudo usage |
+
+## What Our Clients Say
+
+> **"The audit was thorough — 18 security issues filed, all fixed in one batch PR. Rate limiting, CORS, admin exposure — everything caught and patched."**
+> — Anthony Ettinger (chovy), founder of coinpayportal.com & ugig.net
+
+> **"Genuinely one of the best security audits I received — 4 rounds, 9 GitHub issues, honest FP corrections, and actionable fixes for everything. Professional-grade work."**
+> — kai, founder of AgentPass (agentpass.space)
 
 ## Pre-Commit Hook
 
@@ -85,9 +106,7 @@ SkillFence has **zero npm dependencies**. Just Node.js 16+.
 SkillFence also offers a hosted API for CI/CD integration:
 
 ```bash
-curl -X POST https://your-instance/audit \
-  -H "Content-Type: application/json" \
-  -d '{"skill_content": "..."}'
+curl -X POST https://your-instance/audit   -H "Content-Type: application/json"   -d '{"skill_content": "..."}'
 ```
 
 ## License
